@@ -18,15 +18,26 @@
         <p>Did you take your dose today?</p>
 
         <form method="POST">
-            <label><input type="radio" name="status" value="taken" required> Yes, taken</label>
-            <label><input type="radio" name="status" value="missed"> No, missed</label>
-            <label><input type="radio" name="status" value="side_effects"> Took it, but had side effects</label>
+    <label><input type="radio" name="status" value="taken" required> Yes, taken</label>
+    <label><input type="radio" name="status" value="missed"> No, missed</label>
+    <label><input type="radio" name="status" value="side_effects"> Took it, but had side effects</label>
 
-            <label>Note (optional):</label>
-            <textarea name="note" rows="3"></textarea><br>
+    <label>If missed, why? (optional):</label>
+    <select name="barrier">
+        <option value="">-- Select reason --</option>
+        <option value="forgot">Forgot</option>
+        <option value="side_effects">Side effects</option>
+        <option value="out_of_stock">Ran out of medicine</option>
+        <option value="cost">Cost / couldn't afford</option>
+        <option value="feeling_better">Felt better, stopped</option>
+        <option value="other">Other</option>
+    </select><br><br>
 
-            <button type="submit">Submit Check-in</button>
-        </form>
+    <label>Additional note (optional):</label>
+    <textarea name="note" rows="3"></textarea><br>
+
+    <button type="submit">Submit Check-in</button>
+</form>
 
         <br>
         <a class="back-link" href="/patients">← Back to patient list</a>

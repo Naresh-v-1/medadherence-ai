@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ patient.name }} - Patient Detail</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/patients">Patient Check-in</a>
+            <a href="/reminders">Reminders Log</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>{{ patient.name }}</h1>
+        <p><strong>Phone:</strong> {{ patient.phone }} &nbsp; | &nbsp; <strong>Age:</strong> {{ patient.age }} &nbsp; | &nbsp; <strong>Dose Time:</strong> {{ patient.dose_time }}</p>
+        <p><strong>Pills Remaining:</strong> {{ patient.pills_remaining }}</p>
+
+        <p><span class="badge {{ risk }}">{{ risk }} RISK</span> &nbsp; {{ reason }}</p>
+
+        <h2>Dose History</h2>
+        <table>
+            <tr>
+    <th>Date</th>
+    <th>Status</th>
+    <th>Barrier</th>
+    <th>Note</th>
+</tr>
+{% for log in logs %}
+<tr class="{{ 'High' if log.status == 'missed' else ('Medium' if log.status == 'side_effects' else 'Low') }}">
+    <td>{{ log.date.strftime('%d %b %Y, %I:%M %p') }}</td>
+    <td>{{ log.status }}</td>
+    <td>{{ log.barrier or '-' }}</td>
+    <td>{{ log.note or '-' }}</td>
+</tr>
+{% endfor %}
+{% if logs|length == 0 %}
+<tr><td colspan="4">No check-ins recorded yet.</td></tr>
+{% endif %}
+        </table>
+
+        <br>
+        <a class="back-link" href="/patients">← Back to Patient List</a>
+    </div>
+</body>
+</html>

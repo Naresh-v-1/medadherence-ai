@@ -18,6 +18,9 @@ class Patient(db.Model):
     age = db.Column(db.Integer)
     treatment_start_date = db.Column(db.DateTime, default=datetime.utcnow)
     dose_time = db.Column(db.String(10), default="20:00")
+    pills_remaining = db.Column(db.Integer, default=10)
+    caregiver_name = db.Column(db.String(100))
+    caregiver_phone = db.Column(db.String(20))
 
     dose_logs = db.relationship('DoseLog', backref='patient', lazy=True)
 
@@ -30,10 +33,24 @@ class DoseLog(db.Model):
     patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), nullable=False)  # "taken", "missed", "side_effects"
+    barrier = db.Column(db.String(30))  # forgot, side_effects, out_of_stock, cost, feeling_better, other
     note = db.Column(db.String(200))
 
     def __repr__(self):
         return f"<DoseLog {self.patient_id} - {self.status}>"
+
+
+class Reminder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    message = db.Column(db.String(300), nullable=False)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+    channel = db.Column(db.String(20), default="SMS")  # SMS / WhatsApp (simulated)
+
+    patient = db.relationship('Patient')
+
+    def __repr__(self):
+        return f"<Reminder to {self.patient_id}>"
 
 
 # ---------- RISK ENGINE ----------
@@ -75,18 +92,50 @@ def calculate_risk(patient):
 
     return "Low", "Consistently taking doses on schedule."
 
+def generate_reminder_message(patient, risk_level, reason, language="en"):
+    """Builds a reminder message tailored to risk level, in English or Hindi."""
+
+    messages = {
+        "en": {
+            "High": f"Hi {patient.name}, we noticed you may have missed recent TB doses. "
+                    f"Your health worker has been notified and may visit soon. "
+                    f"Please take your dose today — it matters for your recovery.",
+            "Medium": f"Hi {patient.name}, this is a reminder to take your TB medicine at "
+                      f"{patient.dose_time}. Missing doses can slow your recovery — you're doing well, keep going!",
+            "Low": f"Hi {patient.name}, reminder: please take your TB dose at {patient.dose_time} today. "
+                   f"Great job staying consistent!"
+        },
+        "hi": {
+            "High": f"नमस्ते {patient.name}, लगता है आपने हाल ही में टीबी की दवा नहीं ली है। "
+                    f"आपके स्वास्थ्य कार्यकर्ता को सूचित कर दिया गया है और वे जल्द ही आपसे मिल सकते हैं। "
+                    f"कृपया आज अपनी दवा जरूर लें — यह आपके ठीक होने के लिए जरूरी है।",
+            "Medium": f"नमस्ते {patient.name}, यह एक याद दिलाने वाला संदेश है — कृपया अपनी टीबी की दवा "
+                      f"{patient.dose_time} बजे लें। दवा छोड़ने से रिकवरी धीमी हो सकती है — आप अच्छा कर रहे हैं, ऐसे ही जारी रखें!",
+            "Low": f"नमस्ते {patient.name}, याद दिलाना चाहते हैं — कृपया आज {patient.dose_time} बजे अपनी टीबी की दवा लें। "
+                   f"नियमित रहने के लिए बहुत बढ़िया!"
+        }
+    }
+
+    return messages.get(language, messages["en"]).get(risk_level, messages["en"]["Low"])
 
 # ---------- ROUTES ----------
 
 @app.route("/")
 def home():
-    return "<h1>MedAdherence AI is running 🚀</h1><p><a href='/dashboard'>Health Worker Dashboard</a> | <a href='/patients'>Patient Check-in List</a></p>"
-
+    return render_template("home.html")
 
 @app.route("/patients")
 def patients():
     all_patients = Patient.query.all()
     return render_template("patients.html", patients=all_patients)
+
+
+@app.route("/restock/<int:patient_id>")
+def restock(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    patient.pills_remaining += 10  # simulate a fresh 10-day supply given
+    db.session.commit()
+    return redirect(url_for("patients"))
 
 
 @app.route("/checkin/<int:patient_id>", methods=["GET", "POST"])
@@ -95,16 +144,28 @@ def checkin(patient_id):
 
     if request.method == "POST":
         status = request.form.get("status")
+        barrier = request.form.get("barrier", "")
         note = request.form.get("note", "")
 
-        new_log = DoseLog(patient_id=patient.id, status=status, note=note)
+        new_log = DoseLog(patient_id=patient.id, status=status, barrier=barrier, note=note)
         db.session.add(new_log)
+
+        if status in ("taken", "side_effects") and patient.pills_remaining > 0:
+            patient.pills_remaining -= 1
+
         db.session.commit()
 
         return redirect(url_for("patients"))
 
     return render_template("checkin.html", patient=patient)
 
+@app.route("/patient/<int:patient_id>")
+def patient_detail(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    logs = DoseLog.query.filter_by(patient_id=patient.id).order_by(DoseLog.date.desc()).all()
+    risk_level, reason = calculate_risk(patient)
+
+    return render_template("patient_detail.html", patient=patient, logs=logs, risk=risk_level, reason=reason)
 
 @app.route("/dashboard")
 def dashboard():
@@ -128,13 +189,51 @@ def dashboard():
     return render_template("dashboard.html", patients=patient_data)
 
 
+@app.route("/send-reminders")
+def send_reminders():
+    language = request.args.get("lang", "en")
+    all_patients = Patient.query.all()
+    count = 0
+
+    for p in all_patients:
+        risk_level, reason = calculate_risk(p)
+        message = generate_reminder_message(p, risk_level, reason, language=language)
+
+        reminder = Reminder(patient_id=p.id, message=message, channel="SMS")
+        db.session.add(reminder)
+        count += 1
+
+        # For High risk patients, also simulate notifying the caregiver
+        if risk_level == "High" and p.caregiver_name:
+            caregiver_message = (
+                f"Hello {p.caregiver_name}, this is a health alert regarding {p.name}'s TB treatment. "
+                f"They may have missed recent doses. Please check in with them and encourage them to continue treatment."
+            )
+            caregiver_reminder = Reminder(
+                patient_id=p.id,
+                message=f"[To Caregiver: {p.caregiver_name}] {caregiver_message}",
+                channel="SMS (Caregiver)"
+            )
+            db.session.add(caregiver_reminder)
+            count += 1
+
+    db.session.commit()
+    return redirect(url_for("reminders_log"))
+
+
+@app.route("/reminders")
+def reminders_log():
+    all_reminders = Reminder.query.order_by(Reminder.sent_at.desc()).all()
+    return render_template("reminders.html", reminders=all_reminders)
+
+
 # ---------- SEED SAMPLE DATA ----------
 
 def seed_data():
     if Patient.query.count() == 0:
-        p1 = Patient(name="Ramesh Kumar", phone="9876543210", age=45, dose_time="20:00")
-        p2 = Patient(name="Sunita Devi", phone="9876500000", age=38, dose_time="09:00")
-        p3 = Patient(name="Ali Sheikh", phone="9876511111", age=52, dose_time="21:00")
+        p1 = Patient(name="Ramesh Kumar", phone="9876543210", age=45, dose_time="20:00", pills_remaining=2,caregiver_name="Sunil Kumar (Son)", caregiver_phone="9876543211")
+        p2 = Patient(name="Sunita Devi", phone="9876500000", age=38, dose_time="09:00", pills_remaining=8,caregiver_name="Meena Devi (Sister)", caregiver_phone="9876500001")
+        p3 = Patient(name="Ali Sheikh", phone="9876511111", age=52, dose_time="21:00", pills_remaining=1,caregiver_name="Fatima Sheikh (Wife)", caregiver_phone="9876511112")
         db.session.add_all([p1, p2, p3])
         db.session.commit()
 

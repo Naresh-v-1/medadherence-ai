@@ -10,12 +10,19 @@
         <div>
             <a href="/dashboard">Dashboard</a>
             <a href="/patients">Patient Check-in</a>
+            <a href="/reminders">Reminders Log</a>
         </div>
     </div>
 
     <div class="container">
         <h1>Health Worker Dashboard</h1>
         <p>Patients sorted by risk — highest risk shown first.</p>
+
+        <p>
+            <a class="btn" href="/send-reminders?lang=en">📩 Send Reminders (English)</a>
+            &nbsp;
+            <a class="btn" href="/send-reminders?lang=hi">📩 रिमाइंडर भेजें (Hindi)</a>
+        </p>
 
         <table>
             <tr>
@@ -27,7 +34,7 @@
             {% for p in patients %}
             <tr class="{{ p.risk }}">
                 <td><span class="badge {{ p.risk }}">{{ p.risk }}</span></td>
-                <td>{{ p.name }}</td>
+                <td><a href="/patient/{{ p.id }}">{{ p.name }}</a></td>
                 <td>{{ p.phone }}</td>
                 <td>{{ p.reason }}</td>
             </tr>

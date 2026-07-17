@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reminders Log - MedAdherence AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/patients">Patient Check-in</a>
+            <a href="/reminders">Reminders Log</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Reminders Sent (Simulated SMS/WhatsApp)</h1>
+        <p>In production, these would be sent via Twilio SMS or WhatsApp Business API. Here, we log them to demonstrate the logic.</p>
+
+        <table>
+            <tr>
+                <th>Sent At</th>
+                <th>Patient</th>
+                <th>Channel</th>
+                <th>Message</th>
+            </tr>
+            {% for r in reminders %}
+            <tr>
+                <td>{{ r.sent_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+                <td>{{ r.patient.name }}</td>
+                <td>{{ r.channel }}</td>
+                <td>{{ r.message }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+        <a class="back-link" href="/dashboard">← Back to Dashboard</a>
+    </div>
+</body>
+</html>
