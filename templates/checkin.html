@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check-in - {{ patient.name }}</title>
+</head>
+<body>
+    <h1>Daily Check-in for {{ patient.name }}</h1>
+    <p>Did you take your dose today?</p>
+
+    <form method="POST">
+        <label><input type="radio" name="status" value="taken" required> Yes, taken</label><br>
+        <label><input type="radio" name="status" value="missed"> No, missed</label><br>
+        <label><input type="radio" name="status" value="side_effects"> Took it, but had side effects</label><br><br>
+
+        <label>Note (optional):</label><br>
+        <textarea name="note" rows="3" cols="30"></textarea><br><br>
+
+        <button type="submit">Submit Check-in</button>
+    </form>
+
+    <br>
+    <a href="/patients">Back to patient list</a>
+</body>
+</html>
