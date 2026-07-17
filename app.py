@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medadherence.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = "hackathon-demo-secret-key"  # simple secret for session, fine for demo
+
+HEALTH_WORKER_PASSWORD = "tb2026"  # simple hardcoded password for demo purposes
 
 db = SQLAlchemy(app)
 
@@ -92,6 +95,18 @@ def calculate_risk(patient):
 
     return "Low", "Consistently taking doses on schedule."
 
+def calculate_streak(patient):
+    """Counts consecutive most-recent days where the dose was taken (not missed)."""
+    logs = DoseLog.query.filter_by(patient_id=patient.id).order_by(DoseLog.date.desc()).all()
+
+    streak = 0
+    for log in logs:
+        if log.status in ("taken", "side_effects"):
+            streak += 1
+        else:
+            break
+    return streak
+
 def generate_reminder_message(patient, risk_level, reason, language="en"):
     """Builds a reminder message tailored to risk level, in English or Hindi."""
 
@@ -164,11 +179,15 @@ def patient_detail(patient_id):
     patient = Patient.query.get_or_404(patient_id)
     logs = DoseLog.query.filter_by(patient_id=patient.id).order_by(DoseLog.date.desc()).all()
     risk_level, reason = calculate_risk(patient)
+    streak = calculate_streak(patient)
 
-    return render_template("patient_detail.html", patient=patient, logs=logs, risk=risk_level, reason=reason)
+    return render_template("patient_detail.html", patient=patient, logs=logs, risk=risk_level, reason=reason, streak=streak)
 
 @app.route("/dashboard")
 def dashboard():
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
+
     all_patients = Patient.query.all()
     patient_data = []
 
@@ -260,6 +279,25 @@ def seed_data():
         db.session.commit()
         print("Sample patients and dose logs added!")
 
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        password = request.form.get("password")
+        if password == HEALTH_WORKER_PASSWORD:
+            session["logged_in"] = True
+            return redirect(url_for("dashboard"))
+        else:
+            error = "Incorrect password. Try again."
+
+    return render_template("login.html", error=error)
+
+
+@app.route("/logout")
+def logout():
+    session.pop("logged_in", None)
+    return redirect(url_for("login"))
 
 if __name__ == "__main__":
     with app.app_context():
