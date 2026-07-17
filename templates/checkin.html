@@ -2,23 +2,34 @@
 <html>
 <head>
     <title>Check-in - {{ patient.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Daily Check-in for {{ patient.name }}</h1>
-    <p>Did you take your dose today?</p>
+    <div class="navbar">
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/patients">Patient Check-in</a>
+        </div>
+    </div>
 
-    <form method="POST">
-        <label><input type="radio" name="status" value="taken" required> Yes, taken</label><br>
-        <label><input type="radio" name="status" value="missed"> No, missed</label><br>
-        <label><input type="radio" name="status" value="side_effects"> Took it, but had side effects</label><br><br>
+    <div class="container">
+        <h1>Daily Check-in for {{ patient.name }}</h1>
+        <p>Did you take your dose today?</p>
 
-        <label>Note (optional):</label><br>
-        <textarea name="note" rows="3" cols="30"></textarea><br><br>
+        <form method="POST">
+            <label><input type="radio" name="status" value="taken" required> Yes, taken</label>
+            <label><input type="radio" name="status" value="missed"> No, missed</label>
+            <label><input type="radio" name="status" value="side_effects"> Took it, but had side effects</label>
 
-        <button type="submit">Submit Check-in</button>
-    </form>
+            <label>Note (optional):</label>
+            <textarea name="note" rows="3"></textarea><br>
 
-    <br>
-    <a href="/patients">Back to patient list</a>
+            <button type="submit">Submit Check-in</button>
+        </form>
+
+        <br>
+        <a class="back-link" href="/patients">← Back to patient list</a>
+    </div>
 </body>
 </html>

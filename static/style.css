@@ -1,0 +1,143 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f8;
+    color: #222;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.navbar {
+    background-color: #1a5276;
+    color: white;
+    padding: 16px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar h2 {
+    margin: 0;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    color: #1a5276;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #e0e0e0;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+th {
+    background-color: #1a5276;
+    color: white;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+.High {
+    background-color: #fdecea;
+    border-left: 5px solid #e74c3c;
+}
+
+.Medium {
+    background-color: #fef9e7;
+    border-left: 5px solid #f39c12;
+}
+
+.Low {
+    background-color: #eafaf1;
+    border-left: 5px solid #27ae60;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 0.85em;
+    color: white;
+}
+
+.badge.High { background-color: #e74c3c; }
+.badge.Medium { background-color: #f39c12; }
+.badge.Low { background-color: #27ae60; }
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #1a5276;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.btn:hover {
+    background-color: #154360;
+}
+
+form label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.05em;
+}
+
+textarea {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button[type="submit"] {
+    background-color: #1a5276;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+    background-color: #154360;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+}

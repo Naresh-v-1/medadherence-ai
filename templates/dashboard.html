@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Patients - MedAdherence AI</title>
+    <title>Health Worker Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -14,22 +14,22 @@
     </div>
 
     <div class="container">
-        <h1>TB Patients</h1>
+        <h1>Health Worker Dashboard</h1>
+        <p>Patients sorted by risk — highest risk shown first.</p>
+
         <table>
             <tr>
+                <th>Risk Level</th>
                 <th>Name</th>
                 <th>Phone</th>
-                <th>Age</th>
-                <th>Dose Time</th>
-                <th>Action</th>
+                <th>Reason</th>
             </tr>
-            {% for patient in patients %}
-            <tr>
-                <td>{{ patient.name }}</td>
-                <td>{{ patient.phone }}</td>
-                <td>{{ patient.age }}</td>
-                <td>{{ patient.dose_time }}</td>
-                <td><a class="btn" href="/checkin/{{ patient.id }}">Check-in</a></td>
+            {% for p in patients %}
+            <tr class="{{ p.risk }}">
+                <td><span class="badge {{ p.risk }}">{{ p.risk }}</span></td>
+                <td>{{ p.name }}</td>
+                <td>{{ p.phone }}</td>
+                <td>{{ p.reason }}</td>
             </tr>
             {% endfor %}
         </table>
