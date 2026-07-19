@@ -6,15 +6,17 @@
 </head>
 <body>
     <div class="navbar">
-        <h2>MedAdherence AI</h2>
-        <div>
-            <a href="/checkin/{{ patient.id }}">Daily Check-in</a>
-            <a href="/messages">Messages</a>
-            <a href="/my-reminders">My Reminders</a>
-            <a href="/patient-account">My Account</a>
-            <a href="/patient-logout">Logout</a>
-        </div>
+    <h2>MedAdherence AI</h2>
+    <div>
+        <a href="/checkin/{{ patient.id }}">Daily Check-in</a>
+        {% if patient.health_worker_id %}
+        <a href="/messages">Messages</a>
+        {% endif %}
+        <a href="/my-reminders">My Reminders</a>
+        <a href="/patient-account">My Account</a>
+        <a href="/patient-logout">Logout</a>
     </div>
+</div>
 
     <div class="container">
         <h1>Welcome, {{ patient.name }}</h1>

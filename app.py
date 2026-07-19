@@ -463,16 +463,20 @@ def patient_register():
         reminder_day_of_month = request.form.get("reminder_day_of_month")
         caregiver_name = request.form.get("caregiver_name")
         caregiver_phone = request.form.get("caregiver_phone")
-        worker_code = request.form.get("worker_code")
+        worker_code = request.form.get("worker_code", "").strip()
 
-        worker = HealthWorker.query.filter_by(worker_code=worker_code).first()
         existing = Patient.query.filter_by(phone=phone).first()
 
-        if not worker:
-            error = "Invalid Health Worker ID. Please check with your health worker and try again."
-        elif existing:
+        worker = None
+        if worker_code:
+            worker = HealthWorker.query.filter_by(worker_code=worker_code).first()
+            if not worker:
+                error = "That Health Worker ID wasn't found. Leave it blank if you don't have one, or double check with your health worker."
+
+        if not error and existing:
             error = "An account with this phone number already exists. Please log in instead."
-        else:
+
+        if not error:
             new_patient = Patient(
                 name=name,
                 phone=phone,
@@ -484,7 +488,7 @@ def patient_register():
                 reminder_day_of_month=int(reminder_day_of_month) if reminder_day_of_month else None,
                 caregiver_name=caregiver_name,
                 caregiver_phone=caregiver_phone,
-                health_worker_id=worker.id
+                health_worker_id=worker.id if worker else None
             )
             db.session.add(new_patient)
             db.session.commit()

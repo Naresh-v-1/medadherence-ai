@@ -9,9 +9,11 @@
         <h2>MedAdherence AI</h2>
         <div>
             <a href="/patient-dashboard">My Dashboard</a>
-            <a href="/my-reminders">My Reminders</a>
-            <a href="/patient-account">My Account</a>
-            <a href="/patient-logout">Logout</a>
+{% if patient.health_worker_id %}
+<a href="/messages">Messages</a>
+{% endif %}
+<a href="/my-reminders">My Reminders</a>
+<a href="/patient-account">My Account</a>
             
         </div>
     </div>

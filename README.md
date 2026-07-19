@@ -11,14 +11,15 @@ Patients on long-term treatment (especially TB) frequently drop off medication b
 MedAdherence AI connects patients and health workers in one platform:
 
 - **Multi-clinic support** — any number of health workers can register and manage their own patient panel, each with a unique Worker ID
-- **Patient self-registration** — patients register themselves under their assigned health worker using that Worker ID
-- **Daily check-ins** — patients report whether they took their dose, with structured reasons if missed (forgot, side effects, ran out of stock, cost, etc.)
+- **Patient self-registration** — patients register under their assigned health worker using that Worker ID, or register independently if their doctor isn't yet using the platform
+- **Daily check-ins** — patients report whether they took their dose, with structured reasons if missed (forgot, side effects, ran out of stock, cost, etc.), limited to one check-in per day (editable)
 - **Explainable AI-style risk scoring** — detects missed-dose patterns and classifies patients as Low / Medium / High risk, with a plain-English reason for health workers
 - **Health worker dashboard** — patients sorted by risk so the most urgent cases get attention first
-- **Smart reminders** — personalized SMS/WhatsApp-style messages (simulated) in English or Hindi, sent manually by health workers or automatically by a background scheduler
+- **Smart reminders** — personalized messages (simulated SMS/WhatsApp) in English or Hindi, sent manually by health workers or automatically by a background scheduler
 - **Flexible reminder scheduling** — patients set their own reminder frequency: daily, weekly, or monthly (for special pills taken less often)
+- **Live reminder status indicator** — patients see whether their reminder is upcoming, already sent, or not needed today
 - **Caregiver alerts** — high-risk patients automatically trigger a message to a family caregiver, extending the safety net beyond the patient alone
-- **Two-way messaging** — patients and their assigned health worker can chat directly within the platform
+- **Two-way messaging** — patients and their assigned health worker can chat directly within the platform (hidden automatically for patients with no assigned worker)
 - **Medicine stock tracking** — automatic pill countdown with low-stock warnings and restock flow, addressing a real but under-discussed cause of treatment dropout
 - **Adherence streaks** — positive reinforcement for consistent patients, not just punitive missed-dose alerts
 - **Program analytics** — health workers get an aggregate view: risk distribution, total reminders sent, low-stock patients, and the most common reasons for missed doses across their patient panel
@@ -37,7 +38,7 @@ MedAdherence AI connects patients and health workers in one platform:
 | Feature | Status |
 |---|---|
 | Multi-worker registration & login | ✅ |
-| Patient self-registration under a specific worker | ✅ |
+| Patient self-registration (with or without a worker) | ✅ |
 | Daily check-in with structured missed-dose reasons | ✅ |
 | One check-in per day, editable | ✅ |
 | Explainable risk-scoring engine | ✅ |
@@ -53,11 +54,20 @@ MedAdherence AI connects patients and health workers in one platform:
 | Program analytics dashboard | ✅ |
 | Patient account edit/delete | ✅ |
 | Live deployment | ✅ |
+| Real SMS delivery | ⚠️ Simulated (see note below) |
+
+## A note on SMS delivery
+
+Reminders in this build are simulated — they're generated with real personalization logic (risk-based tone, language, caregiver escalation) and logged in-app rather than sent as real text messages. This was a deliberate scope decision after evaluating real integration:
+
+We attempted integration with **Twilio** (blocked by mandatory A2P 10DLC carrier registration for sending to US-purchased numbers, and India numbers require additional business verification) and **Fast2SMS** (blocked by a mandatory minimum ₹100 real-money recharge before their API/Quick SMS routes unlock, even with free trial credit already in the account). Both are genuine regulatory/business gates on SMS gateways in India, not something fixable with more code — and reflect a real constraint any team deploying this in production would need to plan for (budget, business registration, and template approval lead time).
+
+In production, this reminder engine would plug directly into Twilio, Fast2SMS, or the WhatsApp Business API — the message generation and scheduling logic is already built and gateway-agnostic.
 
 ## Planned Real-World Extensions
 
+- Real SMS/WhatsApp delivery via a paid SMS gateway (Twilio / Fast2SMS / WhatsApp Business API)
 - Voice messages and image sharing between patients and health workers (requires persistent cloud storage — not feasible on free-tier hosting)
-- Real SMS/WhatsApp delivery via Twilio / WhatsApp Business API (currently simulated and logged for demo purposes)
 - Integration with India's **Ni-kshay** TB program portal
 - IVR/voice-based check-ins for patients without smartphones
 - OTP-based phone verification instead of plain-text passwords
@@ -97,11 +107,11 @@ Then open `http://127.0.0.1:5000` in your browser.
 - `/analytics` — Program-level analytics
 
 **Patient**
-- `/patient-register` — Self-registration under a health worker
+- `/patient-register` — Self-registration, optionally under a health worker
 - `/patient-login` — Patient login
 - `/patient-dashboard` — Personal dashboard (risk, streak, reminder settings)
 - `/checkin/<id>` — Daily check-in (create or edit today's entry)
-- `/messages` — Chat with assigned health worker
+- `/messages` — Chat with assigned health worker (if one is assigned)
 - `/my-reminders` — Personal reminders received
 - `/patient-account` — Edit details or delete account
 
