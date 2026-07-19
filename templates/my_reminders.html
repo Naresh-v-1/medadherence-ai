@@ -1,43 +1,45 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Reminders Log - MedAdherence AI</title>
+    <title>My Reminders - MedAdherence AI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="navbar">
-    <h2>MedAdherence AI</h2>
-    <div>
-        <a href="/dashboard">Dashboard</a>
-        <a href="/patients">Patient List</a>
-        <a href="/reminders">Reminders Log</a>
-        <a href="/analytics">Analytics</a>
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/patient-dashboard">My Dashboard</a>
+            <a href="/checkin/{{ patient.id }}">Daily Check-in</a>
+            <a href="/patient-account">My Account</a>
+            <a href="/patient-logout">Logout</a>
+            
+        </div>
     </div>
-</div>
 
     <div class="container">
-        <h1>Reminders Sent (Simulated SMS/WhatsApp)</h1>
-        <p>In production, these would be sent via Twilio SMS or WhatsApp Business API. Here, we log them to demonstrate the logic.</p>
+        <h1>My Reminders</h1>
+        <p>Messages sent to you regarding your treatment.</p>
 
         <table>
             <tr>
                 <th>Sent At</th>
-                <th>Patient</th>
                 <th>Channel</th>
                 <th>Message</th>
             </tr>
             {% for r in reminders %}
             <tr>
                 <td>{{ r.sent_at.strftime('%d %b %Y, %I:%M %p') }}</td>
-                <td>{{ r.patient.name }}</td>
                 <td>{{ r.channel }}{% if 'Auto' in r.channel %} 🤖{% endif %}</td>
                 <td>{{ r.message }}</td>
             </tr>
             {% endfor %}
+            {% if reminders|length == 0 %}
+            <tr><td colspan="3">No reminders sent yet.</td></tr>
+            {% endif %}
         </table>
 
         <br>
-        <a class="back-link" href="/dashboard">← Back to Dashboard</a>
+        <a class="back-link" href="/patient-dashboard">← Back to My Dashboard</a>
     </div>
 </body>
 </html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics - MedAdherence AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/patients">Patient List</a>
+            <a href="/reminders">Reminders Log</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Program Analytics</h1>
+        <p>A quick overview of adherence trends across all patients.</p>
+
+        <div style="display:flex; gap:20px; flex-wrap:wrap; margin:20px 0;">
+            <div style="flex:1; min-width:180px; background:white; padding:20px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1); text-align:center;">
+                <h2 style="margin:0; color:#1a5276;">{{ total_patients }}</h2>
+                <p style="margin:5px 0 0 0;">Total Patients</p>
+            </div>
+            <div style="flex:1; min-width:180px; background:white; padding:20px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1); text-align:center;">
+                <h2 style="margin:0; color:#e74c3c;">{{ risk_counts.High }}</h2>
+                <p style="margin:5px 0 0 0;">High Risk</p>
+            </div>
+            <div style="flex:1; min-width:180px; background:white; padding:20px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1); text-align:center;">
+                <h2 style="margin:0; color:#f39c12;">{{ risk_counts.Medium }}</h2>
+                <p style="margin:5px 0 0 0;">Medium Risk</p>
+            </div>
+            <div style="flex:1; min-width:180px; background:white; padding:20px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1); text-align:center;">
+                <h2 style="margin:0; color:#27ae60;">{{ risk_counts.Low }}</h2>
+                <p style="margin:5px 0 0 0;">Low Risk</p>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:20px; flex-wrap:wrap; margin:20px 0;">
+            <div style="flex:1; min-width:180px; background:white; padding:20px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1); text-align:center;">
+                <h2 style="margin:0; color:#1a5276;">{{ total_reminders_sent }}</h2>
+                <p style="margin:5px 0 0 0;">Total Reminders Sent</p>
+            </div>
+            <div style="flex:1; min-width:180px; background:white; padding:20px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1); text-align:center;">
+                <h2 style="margin:0; color:#e74c3c;">{{ low_stock_count }}</h2>
+                <p style="margin:5px 0 0 0;">Patients Low on Stock</p>
+            </div>
+        </div>
+
+        <h2>Most Common Reasons for Missed Doses</h2>
+        <table>
+            <tr>
+                <th>Reason</th>
+                <th>Count</th>
+            </tr>
+            {% for reason, count in sorted_barriers %}
+            <tr>
+                <td>{{ reason.replace('_', ' ').title() }}</td>
+                <td>{{ count }}</td>
+            </tr>
+            {% endfor %}
+            {% if sorted_barriers|length == 0 %}
+            <tr><td colspan="2">No missed doses recorded yet.</td></tr>
+            {% endif %}
+        </table>
+    </div>
+</body>
+</html>

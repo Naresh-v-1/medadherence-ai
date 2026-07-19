@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Messages with {{ patient.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/patients">Patient List</a>
+            <a href="/reminders">Reminders Log</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Messages with {{ patient.name }}</h1>
+
+        <div style="background:white; border-radius:10px; padding:20px; max-height:400px; overflow-y:auto; margin-bottom:20px;">
+            {% for m in messages %}
+            <div style="margin-bottom:12px; text-align: {{ 'right' if m.sender == 'worker' else 'left' }};">
+                <span style="display:inline-block; padding:8px 14px; border-radius:14px; max-width:70%;
+                    background: {{ '#1a5276' if m.sender == 'worker' else '#eee' }};
+                    color: {{ 'white' if m.sender == 'worker' else '#222' }};">
+                    {{ m.body }}
+                </span>
+                <div style="font-size:0.75em; color:#888;">{{ m.sent_at.strftime('%d %b, %I:%M %p') }} — {{ 'You' if m.sender == 'worker' else patient.name }}</div>
+            </div>
+            {% endfor %}
+            {% if messages|length == 0 %}
+            <p>No messages yet with this patient.</p>
+            {% endif %}
+        </div>
+
+        <form method="POST">
+            <textarea name="body" rows="2" placeholder="Type a message..." style="width:100%; max-width:500px; padding:8px; border-radius:6px; border:1px solid #ccc;" required></textarea><br><br>
+            <button type="submit">Send</button>
+        </form>
+
+        <br>
+        <a class="back-link" href="/patients">← Back to Patient List</a>
+    </div>
+</body>
+</html>

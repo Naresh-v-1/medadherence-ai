@@ -7,21 +7,29 @@
 <body>
     <div class="navbar">
         <h2>MedAdherence AI</h2>
-        <div>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/patients">Patient Check-in</a>
-        </div>
     </div>
 
     <div class="container">
         <h1>MedAdherence AI 🚀</h1>
         <p>An AI-powered companion for TB patients — smart check-ins, missed-dose risk detection, and early alerts to health workers before patients drop off treatment.</p>
 
-        <p>
-            <a class="btn" href="/dashboard">Health Worker Dashboard</a>
-            &nbsp;
-            <a class="btn" href="/patients">Patient Check-in</a>
-        </p>
+        <div style="display:flex; gap:30px; margin-top:30px; flex-wrap:wrap;">
+
+            <div style="flex:1; min-width:280px; background:white; padding:20px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                <h2>👩‍⚕️ Health Worker</h2>
+                <p>View patient risk levels, send reminders, and monitor adherence across all patients.</p>
+                <a class="btn" href="/login">Health Worker Login</a>
+            </div>
+
+            <div style="flex:1; min-width:280px; background:white; padding:20px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                <h2>🧑 Patient</h2>
+                <p>Log in to your account to do your daily check-in and manage your reminder settings.</p>
+                <a class="btn" href="/patient-login">Patient Login</a>
+                &nbsp;
+                <a class="btn" href="/patient-register" style="background-color:#27ae60;">Register</a>
+            </div>
+
+        </div>
     </div>
 </body>
 </html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Registration - MedAdherence AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/patient-login">Patient Login</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Patient Registration</h1>
+        <p>Create your account to set up your medicine reminders.</p>
+
+        {% if error %}
+        <p style="color: red;"><strong>{{ error }}</strong></p>
+        {% endif %}
+
+        <form method="POST">
+            <label>Health Worker ID (ask your doctor/health worker for this):</label>
+            <input type="text" name="worker_code" required placeholder="e.g. TB001" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Full Name:</label>
+            <input type="text" name="name" required style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Phone Number:</label>
+            <input type="text" name="phone" required style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Create Password:</label>
+            <input type="password" name="password" required style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Age:</label>
+            <input type="number" name="age" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>What time do you usually take your medicine?</label>
+            <input type="time" name="dose_time" value="20:00" style="padding:8px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Reminder Frequency:</label>
+            <select name="reminder_frequency" id="freq" onchange="toggleFrequencyFields()">
+                <option value="daily">Daily (regular medicine)</option>
+                <option value="weekly">Weekly (once a week)</option>
+                <option value="monthly">Monthly (special pill, once a month)</option>
+            </select><br><br>
+
+            <div id="weekly_field" style="display:none;">
+                <label>Which day of the week?</label>
+                <select name="reminder_day_of_week">
+                    <option value="0">Monday</option>
+                    <option value="1">Tuesday</option>
+                    <option value="2">Wednesday</option>
+                    <option value="3">Thursday</option>
+                    <option value="4">Friday</option>
+                    <option value="5">Saturday</option>
+                    <option value="6">Sunday</option>
+                </select><br><br>
+            </div>
+
+            <div id="monthly_field" style="display:none;">
+                <label>Which day of the month? (1-28)</label>
+                <input type="number" name="reminder_day_of_month" min="1" max="28" style="padding:8px; border-radius:6px; border:1px solid #ccc;"><br><br>
+            </div>
+            
+             <label>Caregiver Name (optional — a family member who can be alerted if you miss doses):</label>
+            <input type="text" name="caregiver_name" placeholder="e.g. Sunil Kumar (Son)" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Caregiver Phone (optional):</label>
+            <input type="text" name="caregiver_phone" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <br>
+        <p>Already have an account? <a href="/patient-login">Login here</a></p>
+    </div>
+
+    <script>
+        function toggleFrequencyFields() {
+            var freq = document.getElementById("freq").value;
+            document.getElementById("weekly_field").style.display = (freq === "weekly") ? "block" : "none";
+            document.getElementById("monthly_field").style.display = (freq === "monthly") ? "block" : "none";
+        }
+    </script>
+</body>
+</html>

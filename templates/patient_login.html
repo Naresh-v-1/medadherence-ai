@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Health Worker Login</title>
+    <title>Patient Login - MedAdherence AI</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="navbar">
         <h2>MedAdherence AI</h2>
         <div>
-            <a href="/worker-register">Register as Health Worker</a>
+            <a href="/patient-register">Register</a>
         </div>
     </div>
 
     <div class="container">
-        <h1>Health Worker Login</h1>
+        <h1>Patient Login</h1>
 
         {% if error %}
         <p style="color: red;"><strong>{{ error }}</strong></p>
         {% endif %}
 
         <form method="POST">
-            <label>Worker ID:</label>
-            <input type="text" name="worker_code" required style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+            <label>Phone Number:</label>
+            <input type="text" name="phone" required style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
 
             <label>Password:</label>
             <input type="password" name="password" required style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
@@ -30,7 +30,7 @@
         </form>
 
         <br>
-        <p>New health worker? <a href="/worker-register">Register here</a></p>
+        <p>New here? <a href="/patient-register">Create an account</a></p>
     </div>
 </body>
 </html>

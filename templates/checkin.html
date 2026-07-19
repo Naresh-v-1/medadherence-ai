@@ -8,39 +8,58 @@
     <div class="navbar">
         <h2>MedAdherence AI</h2>
         <div>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/patients">Patient Check-in</a>
+            <a href="/patient-dashboard">My Dashboard</a>
+            <a href="/my-reminders">My Reminders</a>
+            <a href="/patient-account">My Account</a>
+            <a href="/patient-logout">Logout</a>
+            
         </div>
     </div>
 
     <div class="container">
         <h1>Daily Check-in for {{ patient.name }}</h1>
+
+        {% if todays_log %}
+        <p style="color:#1a5276;"><strong>You've already checked in today. You can update your response below.</strong></p>
+        {% endif %}
+
         <p>Did you take your dose today?</p>
 
         <form method="POST">
-    <label><input type="radio" name="status" value="taken" required> Yes, taken</label>
-    <label><input type="radio" name="status" value="missed"> No, missed</label>
-    <label><input type="radio" name="status" value="side_effects"> Took it, but had side effects</label>
+            <label>
+                <input type="radio" name="status" value="taken" required
+                    {% if todays_log and todays_log.status == "taken" %}checked{% endif %}>
+                Yes, taken
+            </label>
+            <label>
+                <input type="radio" name="status" value="missed"
+                    {% if todays_log and todays_log.status == "missed" %}checked{% endif %}>
+                No, missed
+            </label>
+            <label>
+                <input type="radio" name="status" value="side_effects"
+                    {% if todays_log and todays_log.status == "side_effects" %}checked{% endif %}>
+                Took it, but had side effects
+            </label>
 
-    <label>If missed, why? (optional):</label>
-    <select name="barrier">
-        <option value="">-- Select reason --</option>
-        <option value="forgot">Forgot</option>
-        <option value="side_effects">Side effects</option>
-        <option value="out_of_stock">Ran out of medicine</option>
-        <option value="cost">Cost / couldn't afford</option>
-        <option value="feeling_better">Felt better, stopped</option>
-        <option value="other">Other</option>
-    </select><br><br>
+            <label>If missed, why? (optional):</label>
+            <select name="barrier">
+                <option value="">-- Select reason --</option>
+                <option value="forgot" {% if todays_log and todays_log.barrier == "forgot" %}selected{% endif %}>Forgot</option>
+                <option value="side_effects" {% if todays_log and todays_log.barrier == "side_effects" %}selected{% endif %}>Side effects</option>
+                <option value="out_of_stock" {% if todays_log and todays_log.barrier == "out_of_stock" %}selected{% endif %}>Ran out of medicine</option>
+                <option value="cost" {% if todays_log and todays_log.barrier == "cost" %}selected{% endif %}>Cost / couldn't afford</option>
+                <option value="feeling_better" {% if todays_log and todays_log.barrier == "feeling_better" %}selected{% endif %}>Felt better, stopped</option>
+                <option value="other" {% if todays_log and todays_log.barrier == "other" %}selected{% endif %}>Other</option>
+            </select><br><br>
 
-    <label>Additional note (optional):</label>
-    <textarea name="note" rows="3"></textarea><br>
+            <label>Additional note (optional):</label>
+            <textarea name="note" rows="3">{{ todays_log.note if todays_log else '' }}</textarea><br>
 
-    <button type="submit">Submit Check-in</button>
-</form>
-
-        <br>
-        <a class="back-link" href="/patients">← Back to patient list</a>
+            <button type="submit">
+                {% if todays_log %}Update Check-in{% else %}Submit Check-in{% endif %}
+            </button>
+        </form>
     </div>
 </body>
 </html>

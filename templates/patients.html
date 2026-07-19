@@ -9,12 +9,16 @@
         <h2>MedAdherence AI</h2>
         <div>
             <a href="/dashboard">Dashboard</a>
-            <a href="/patients">Patient Check-in</a>
+            <a href="/patients">Patient List</a>
+            <a href="/reminders">Reminders Log</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/logout">Logout</a>
         </div>
     </div>
 
     <div class="container">
         <h1>TB Patients</h1>
+
         <table>
             <tr>
                 <th>Name</th>
@@ -38,13 +42,16 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a class="btn" href="/checkin/{{ patient.id }}">Check-in</a>
                     {% if patient.pills_remaining <= 3 %}
                         <a class="btn" href="/restock/{{ patient.id }}" style="background-color:#27ae60;">Restock</a>
                     {% endif %}
+                    <a class="btn" href="/worker/messages/{{ patient.id }}">Message</a>
                 </td>
             </tr>
             {% endfor %}
+            {% if patients|length == 0 %}
+            <tr><td colspan="6">No patients assigned to you yet.</td></tr>
+            {% endif %}
         </table>
     </div>
 </body>

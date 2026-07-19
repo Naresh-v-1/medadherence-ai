@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Health Worker Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/login">Login</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Health Worker Registration</h1>
+        <p>Create your account. You'll receive a unique Worker ID that your patients will use to register under you.</p>
+
+        {% if error %}
+        <p style="color: red;"><strong>{{ error }}</strong></p>
+        {% endif %}
+
+        <form method="POST">
+            <label>Full Name:</label>
+            <input type="text" name="name" required style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Choose a Worker ID (patients will use this to register under you):</label>
+            <input type="text" name="worker_code" required placeholder="e.g. TB002" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Phone Number:</label>
+            <input type="text" name="phone" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Create Password:</label>
+            <input type="password" name="password" required style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</body>
+</html>

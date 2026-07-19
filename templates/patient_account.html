@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Account - MedAdherence AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/patient-dashboard">My Dashboard</a>
+            <a href="/checkin/{{ patient.id }}">Daily Check-in</a>
+            <a href="/my-reminders">My Reminders</a>
+            <a href="/patient-logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>My Account</h1>
+
+        {% if error %}
+        <p style="color: red;"><strong>{{ error }}</strong></p>
+        {% endif %}
+        {% if success %}
+        <p style="color: #1e8449;"><strong>{{ success }}</strong></p>
+        {% endif %}
+
+        <form method="POST">
+            <label>Full Name:</label>
+            <input type="text" name="name" value="{{ patient.name }}" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Phone Number:</label>
+            <input type="text" name="phone" value="{{ patient.phone }}" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Age:</label>
+            <input type="number" name="age" value="{{ patient.age or '' }}" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>New Password (leave blank to keep current password):</label>
+            <input type="password" name="password" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Confirm New Password:</label>
+            <input type="password" name="confirm_password" style="padding:8px; width:100%; max-width:300px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <button type="submit">Save Changes</button>
+        </form>
+
+        <hr style="margin:40px 0;">
+
+        <h2 style="color:#e74c3c;">Danger Zone</h2>
+        <p>Deleting your account will permanently remove your profile, check-in history, and reminders. This cannot be undone.</p>
+
+        <form method="POST" action="/patient-delete-account" onsubmit="return confirm('Are you sure you want to permanently delete your account? This cannot be undone.');">
+            <button type="submit" style="background-color:#e74c3c; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Delete My Account</button>
+        </form>
+    </div>
+</body>
+</html>

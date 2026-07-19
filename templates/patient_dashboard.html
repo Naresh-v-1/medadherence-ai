@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Dashboard - MedAdherence AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h2>MedAdherence AI</h2>
+        <div>
+            <a href="/checkin/{{ patient.id }}">Daily Check-in</a>
+            <a href="/messages">Messages</a>
+            <a href="/my-reminders">My Reminders</a>
+            <a href="/patient-account">My Account</a>
+            <a href="/patient-logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Welcome, {{ patient.name }}</h1>
+
+        <p><span class="badge {{ risk }}">{{ risk }} RISK</span> &nbsp; {{ reason }}</p>
+        <p>🔥 <strong>{{ streak }} day streak</strong></p>
+        <p><strong>Pills Remaining:</strong> {{ patient.pills_remaining }}</p>
+
+        {% set status_code, status_text = reminder_status %}
+        <p style="padding:10px 15px; border-radius:8px; display:inline-block;
+            {% if status_code == 'done' %} background:#eafaf1; color:#1e8449;
+            {% elif status_code == 'sent' %} background:#fef9e7; color:#b9770e;
+            {% elif status_code == 'due' %} background:#fdecea; color:#c0392b;
+            {% elif status_code == 'upcoming' %} background:#eaf2f8; color:#1a5276;
+            {% else %} background:#f4f6f8; color:#555;
+            {% endif %}">
+            {% if status_code == 'done' %}✅
+            {% elif status_code == 'sent' %}📩
+            {% elif status_code == 'due' %}⏰
+            {% elif status_code == 'upcoming' %}🔔
+            {% else %}➖
+            {% endif %}
+            {{ status_text }}
+        </p>
+
+        <h2>Reminder Settings</h2>
+        <form method="POST">
+            <label>What time do you take your medicine?</label>
+            <input type="time" name="dose_time" value="{{ patient.dose_time }}" style="padding:8px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Reminder Frequency:</label>
+            <select name="reminder_frequency" id="freq" onchange="toggleFrequencyFields()">
+                <option value="daily" {% if patient.reminder_frequency == "daily" %}selected{% endif %}>Daily</option>
+                <option value="weekly" {% if patient.reminder_frequency == "weekly" %}selected{% endif %}>Weekly</option>
+                <option value="monthly" {% if patient.reminder_frequency == "monthly" %}selected{% endif %}>Monthly (special pill)</option>
+            </select><br><br>
+
+            <div id="weekly_field" style="{% if patient.reminder_frequency != 'weekly' %}display:none;{% endif %}">
+                <label>Which day of the week?</label>
+                <select name="reminder_day_of_week">
+                    <option value="0" {% if patient.reminder_day_of_week == 0 %}selected{% endif %}>Monday</option>
+                    <option value="1" {% if patient.reminder_day_of_week == 1 %}selected{% endif %}>Tuesday</option>
+                    <option value="2" {% if patient.reminder_day_of_week == 2 %}selected{% endif %}>Wednesday</option>
+                    <option value="3" {% if patient.reminder_day_of_week == 3 %}selected{% endif %}>Thursday</option>
+                    <option value="4" {% if patient.reminder_day_of_week == 4 %}selected{% endif %}>Friday</option>
+                    <option value="5" {% if patient.reminder_day_of_week == 5 %}selected{% endif %}>Saturday</option>
+                    <option value="6" {% if patient.reminder_day_of_week == 6 %}selected{% endif %}>Sunday</option>
+                </select><br><br>
+            </div>
+
+            <div id="monthly_field" style="{% if patient.reminder_frequency != 'monthly' %}display:none;{% endif %}">
+                <label>Which day of the month? (1-28)</label>
+                <input type="number" name="reminder_day_of_month" min="1" max="28" value="{{ patient.reminder_day_of_month or '' }}" style="padding:8px; border-radius:6px; border:1px solid #ccc;"><br><br>
+            </div>
+
+            <label>Caregiver Name:</label>
+            <input type="text" name="caregiver_name" value="{{ patient.caregiver_name or '' }}" placeholder="e.g. Sunil Kumar (Son)" style="padding:8px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <label>Caregiver Phone:</label>
+            <input type="text" name="caregiver_phone" value="{{ patient.caregiver_phone or '' }}" style="padding:8px; border-radius:6px; border:1px solid #ccc;"><br><br>
+
+            <button type="submit">Save Settings</button>
+        </form>
+
+        <h2>Recent Check-ins</h2>
+        <table>
+            <tr><th>Date</th><th>Status</th></tr>
+            {% for log in logs %}
+            <tr class="{{ 'High' if log.status == 'missed' else ('Medium' if log.status == 'side_effects' else 'Low') }}">
+                <td>{{ log.date.strftime('%d %b %Y, %I:%M %p') }}</td>
+                <td>{{ log.status }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <script>
+        function toggleFrequencyFields() {
+            var freq = document.getElementById("freq").value;
+            document.getElementById("weekly_field").style.display = (freq === "weekly") ? "block" : "none";
+            document.getElementById("monthly_field").style.display = (freq === "monthly") ? "block" : "none";
+        }
+    </script>
+</body>
+</html>
