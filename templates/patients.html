@@ -45,7 +45,12 @@
                     {% if patient.pills_remaining <= 3 %}
                         <a class="btn" href="/restock/{{ patient.id }}" style="background-color:#27ae60;">Restock</a>
                     {% endif %}
-                    <a class="btn" href="/worker/messages/{{ patient.id }}">Message</a>
+                    <a class="btn" href="/worker/messages/{{ patient.id }}">
+    Message
+    {% if unread_counts.get(patient.id, 0) > 0 %}
+        <span style="background:#e74c3c; color:white; border-radius:50%; padding:2px 7px; font-size:0.8em; margin-left:4px;">{{ unread_counts.get(patient.id) }}</span>
+    {% endif %}
+</a>
                 </td>
             </tr>
             {% endfor %}

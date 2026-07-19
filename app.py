@@ -84,6 +84,7 @@ class Message(db.Model):
     sender = db.Column(db.String(10), nullable=False)
     body = db.Column(db.String(1000), nullable=False)
     sent_at = db.Column(db.DateTime, default=datetime.now)
+    is_read = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f"<Message from {self.sender}>"
@@ -224,7 +225,13 @@ def patients():
         return redirect(url_for("login"))
 
     all_patients = Patient.query.filter_by(health_worker_id=worker_id).all()
-    return render_template("patients.html", patients=all_patients)
+
+    unread_counts = {}
+    for p in all_patients:
+        count = Message.query.filter_by(patient_id=p.id, sender="patient", is_read=False).count()
+        unread_counts[p.id] = count
+
+    return render_template("patients.html", patients=all_patients, unread_counts=unread_counts)
 
 
 @app.route("/restock/<int:patient_id>")
@@ -576,7 +583,9 @@ def patient_dashboard():
     else:
         reminder_status = ("due", "Your dose time has passed — a reminder will be sent shortly if you don't check in.")
 
-    return render_template("patient_dashboard.html", patient=patient, risk=risk_level, reason=reason, streak=streak, logs=logs, reminder_status=reminder_status)
+    unread_count = Message.query.filter_by(patient_id=patient.id, sender="worker", is_read=False).count()
+
+    return render_template("patient_dashboard.html", patient=patient, risk=risk_level, reason=reason, streak=streak, logs=logs, reminder_status=reminder_status, unread_count=unread_count)
 
 
 @app.route("/my-reminders")
@@ -670,6 +679,11 @@ def patient_messages():
             db.session.commit()
         return redirect(url_for("patient_messages"))
 
+    unread_from_worker = Message.query.filter_by(patient_id=patient.id, sender="worker", is_read=False).all()
+    for m in unread_from_worker:
+        m.is_read = True
+    db.session.commit()
+
     all_messages = Message.query.filter_by(patient_id=patient.id).order_by(Message.sent_at.asc()).all()
     return render_template("messages.html", patient=patient, messages=all_messages, no_worker=False)
 
@@ -697,6 +711,11 @@ def worker_messages(patient_id):
             db.session.add(new_message)
             db.session.commit()
         return redirect(url_for("worker_messages", patient_id=patient.id))
+
+    unread_from_patient = Message.query.filter_by(patient_id=patient.id, sender="patient", is_read=False).all()
+    for m in unread_from_patient:
+        m.is_read = True
+    db.session.commit()
 
     all_messages = Message.query.filter_by(patient_id=patient.id).order_by(Message.sent_at.asc()).all()
     return render_template("worker_messages.html", patient=patient, messages=all_messages)
